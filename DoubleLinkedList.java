@@ -17,7 +17,7 @@ public class DoubleLinkedList<T> extends AbstractList<T> {
             newNode.next = head;
             head.prev = newNode;
             head = newNode;
-        }
+        } 
         size++;
     }
 
