@@ -1,34 +1,29 @@
-package com;
+package com; // Asegúrate de que Calculator está en el paquete correcto
+
 import java.util.Stack;
 
-
-
-/**
- * La clase Calculator realiza evaluaciones de operaciones aritméticas postfix 
- * utilizando nuestro StackVector.
- * 
- * @author Fabian Prado
- * @version 1.0
- */
 public class Calculator {
 
-    /**
-     * Evalúa una operación aritmética dada en forma de cadena. La operación
-     * puede contener números y los operadores +, -, *, /, %.
-     * 
-     * @param operation La cadena que representa la operación aritmética.
-     */
-    public void evaluate(String operation) {
-        // Creación de la instancia de la pila
-        Stack<Integer> stack = new Stack<>();
+    private static Calculator instance; // Instancia única para Singleton
 
-        // Creación de una variable booleana para asegurar que la operación se realizó correctamente
+    // Constructor privado
+    private Calculator() {}
+
+    // Método para obtener la instancia única
+    public static Calculator getInstance() {
+        if (instance == null) {
+            instance = new Calculator();
+        }
+        return instance;
+    }
+
+    public void evaluate(String operation) {
+        Stack<Integer> stack = new Stack<>();
         boolean success = true;
 
         for (int i = 0; i < operation.length(); i++) {
             char placeholder = operation.charAt(i);
 
-            // Verificar si el carácter es un número y si tiene más de un dígito
             if (Character.isDigit(placeholder)) {
                 int number = Character.getNumericValue(placeholder);
 
@@ -38,64 +33,49 @@ public class Calculator {
                 }
 
                 stack.push(number);
-            } 
-            // Verificar operadores válidos
-            else if (placeholder == '+' || placeholder == '-' || placeholder == '*' || 
-                     placeholder == '/' || placeholder == '%') {
-
-                // Verificar que haya suficientes números para operar
+            } else if ("+-*/%".indexOf(placeholder) != -1) {
                 if (stack.size() < 2) {
-                    System.out.println("Not enough numbers for operation");
+                    System.out.println("Error: No hay suficientes operandos.");
                     success = false;
                     break;
                 }
 
-                // Obtener ambos números
                 int b = stack.pop();
                 int a = stack.pop();
                 int result = 0;
 
-                // Seleccionar la operación a realizar
                 switch (placeholder) {
-                    case '+':
-                        result = a + b;
-                        break;
-                    case '-':
-                        result = a - b;
-                        break;
-                    case '*':
-                        result = a * b;
-                        break;
+                    case '+': result = a + b; break;
+                    case '-': result = a - b; break;
+                    case '*': result = a * b; break;
                     case '/':
                         if (b == 0) {
-                            System.out.println("Cannot divide by 0");
+                            System.out.println("Error: División por cero.");
                             success = false;
-                            break;
                         } else {
                             result = a / b;
                         }
                         break;
-                    case '%':
-                        result = a % b;
-                        break;
+                    case '%': result = a % b; break;
+                    default:
+                        System.out.println("Error: Operador desconocido.");
+                        success = false;
                 }
+
                 if (!success) break;
                 stack.push(result);
-            } 
-            // Manejar caracteres no válidos, ignorando espacios
-            else if (placeholder != ' ') {
+            } else if (placeholder != ' ') {
+                System.out.println("Error: Caracter inválido detectado -> '" + placeholder + "'");
                 success = false;
-                System.out.println("The string contains an invalid character");
                 break;
             }
         }
 
         if (success) {
-            // Asegurarse de que solo quede un número en la pila
             if (stack.size() == 1) {
-                System.out.println("Result: " + stack.pop());
+                System.out.println("Resultado: " + stack.pop());
             } else {
-                System.out.println("Too many numbers left in the stack");
+                System.out.println("Error: Quedaron demasiados operandos en la pila.");
             }
         }
     }
